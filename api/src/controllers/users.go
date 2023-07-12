@@ -6,6 +6,7 @@ import (
 	"api/src/models"
 	"api/src/repositories"
 	"api/src/responses"
+	"api/src/security"
 	"encoding/json"
 	"errors"
 	"io/ioutil"
@@ -157,6 +158,17 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	userIDToken, erro := authentication.ExtractUserID(r)
+	if erro != nil {
+		responses.Erro(w, http.StatusUnauthorized, erro)
+		return
+	}
+
+	if userID != userIDToken {
+		responses.Erro(w, http.StatusForbidden, errors.New("Não é possível deletar um usuário que não seja o próprio"))
+		return
+	}
+
 	db, erro := database.Connect()
 	if erro != nil {
 		responses.Erro(w, http.StatusInternalServerError, erro)
@@ -167,6 +179,191 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 	repository := repositories.NewUserRepository(db)
 
 	if erro = repository.DeleteUser(userID); erro != nil {
+		responses.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+
+	responses.JSON(w, http.StatusNoContent, nil)
+}
+
+// FollowUser permite um usuário seguir o outro
+func FollowUser(w http.ResponseWriter, r *http.Request) {
+	followerID, erro := authentication.ExtractUserID(r)
+	if erro != nil {
+		responses.Erro(w, http.StatusUnauthorized, erro)
+		return
+	}
+
+	vars := mux.Vars(r)
+	userID, erro := strconv.ParseUint(vars["userId"], 10, 64)
+	if erro != nil {
+		responses.Erro(w, http.StatusBadRequest, erro)
+		return
+	}
+
+	if followerID == userID {
+		responses.Erro(w, http.StatusForbidden, errors.New("Não é possível seguir o próprio usuário"))
+		return
+	}
+
+	db, erro := database.Connect()
+	if erro != nil {
+		responses.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+
+	defer db.Close()
+
+	repository := repositories.NewUserRepository(db)
+	if erro = repository.FollowUser(userID, followerID); erro != nil {
+		responses.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+
+	responses.JSON(w, http.StatusNoContent, nil)
+}
+
+// FollowUser permite um usuário parar seguir o outro
+func UnFollowUser(w http.ResponseWriter, r *http.Request) {
+	followerID, erro := authentication.ExtractUserID(r)
+	if erro != nil {
+		responses.Erro(w, http.StatusUnauthorized, erro)
+		return
+	}
+
+	vars := mux.Vars(r)
+	userID, erro := strconv.ParseUint(vars["userId"], 10, 64)
+	if erro != nil {
+		responses.Erro(w, http.StatusBadRequest, erro)
+		return
+	}
+
+	if followerID == userID {
+		responses.Erro(w, http.StatusForbidden, errors.New("Não é possível parar de seguir o próprio usuário"))
+		return
+	}
+
+	db, erro := database.Connect()
+	if erro != nil {
+		responses.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+	defer db.Close()
+
+	repository := repositories.NewUserRepository(db)
+	if erro = repository.UnFollowUser(userID, followerID); erro != nil {
+		responses.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+
+	responses.JSON(w, http.StatusNoContent, nil)
+}
+
+// GetFollowers permite um usuário acessar quem segue ele, e também quem segue outros usuários
+func GetFollowers(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	userID, erro := strconv.ParseUint(vars["userId"], 10, 64)
+	if erro != nil {
+		responses.Erro(w, http.StatusBadRequest, erro)
+		return
+	}
+
+	db, erro := database.Connect()
+	if erro != nil {
+		responses.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+	defer db.Close()
+
+	repository := repositories.NewUserRepository(db)
+	followers, erro := repository.GetFollowers(userID)
+	if erro != nil {
+		responses.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+
+	responses.JSON(w, http.StatusOK, followers)
+}
+
+// Following permite um usuário ver quem ele segue, e tabém quem os outros usuários seguem.
+func GetFollowing(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	userID, erro := strconv.ParseUint(vars["userId"], 10, 64)
+	if erro != nil {
+		responses.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+
+	db, erro := database.Connect()
+	if erro != nil {
+		responses.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+	defer db.Close()
+
+	repository := repositories.NewUserRepository(db)
+	followers, erro := repository.GetFollowing(userID)
+	if erro != nil {
+		responses.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+
+	responses.JSON(w, http.StatusOK, followers)
+}
+
+// UpdatePassword permite alterar a senha de um usuário
+func UpdatePassword(w http.ResponseWriter, r *http.Request) {
+	userIDToken, erro := authentication.ExtractUserID(r)
+	if erro != nil {
+		responses.Erro(w, http.StatusUnauthorized, erro)
+		return
+	}
+
+	vars := mux.Vars(r)
+	userID, erro := strconv.ParseUint(vars["userId"], 10, 64)
+	if erro != nil {
+		responses.Erro(w, http.StatusBadRequest, erro)
+		return
+	}
+
+	if userID != userIDToken {
+		responses.Erro(w, http.StatusForbidden, errors.New("Não é possível atualizar a senha de um usuário que não seja o seu"))
+		return
+	}
+
+	body, erro := ioutil.ReadAll(r.Body)
+	var password models.Password
+	if erro = json.Unmarshal(body, &password); erro != nil {
+		responses.Erro(w, http.StatusBadRequest, erro)
+		return
+	}
+
+	db, erro := database.Connect()
+	if erro != nil {
+		responses.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+	defer db.Close()
+
+	repository := repositories.NewUserRepository(db)
+	passwordInDatabase, erro := repository.GetPassword(userID)
+	if erro != nil {
+		responses.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+
+	if erro = security.VerifyPassword(passwordInDatabase, password.Current); erro != nil {
+		responses.Erro(w, http.StatusUnauthorized, errors.New("A senha atual não condiz com a que está salva no banco de dados"))
+		return
+	}
+
+	passwordHash, erro := security.Hash(password.New)
+	if erro != nil {
+		responses.Erro(w, http.StatusBadRequest, erro)
+		return
+	}
+
+	if erro = repository.UpdatePassword(userID, string(passwordHash)); erro != nil {
 		responses.Erro(w, http.StatusInternalServerError, erro)
 		return
 	}

@@ -1,0 +1,51 @@
+
+{{ define "likes" }}
+    <i class="fas fa-heart"></i>
+    <span> {{ .Likes }} </span>
+{{ end }}
+
+{{ define "editable" }}
+    <a href="/edit" style="text-decoration: none;">
+        <i class="fas fa-edit"></i>
+    </a>
+{{ end }}
+
+{{ define "removable" }}
+    <a href="/delete" style="text-decoration: none;">
+        <i class="fas fa-trash text-danger"></i>
+    </a>
+{{ end }}
+
+
+{{ define "headerPost"}}
+    <h1 class="display-4"> {{ .Title }}</h1>
+    <p class="lead"> {{ .Content }} </p>
+    <a href="#"> {{ .AuthorNick }} - {{ .CreateAt.Format "02/01/2006" }} </a>
+    <hr class="my-4">
+    <!-- 
+        O Golang tem uma forma diferente de formatação de datas, ele utiliza uma data como referencia.
+        Jan 2 15:04:05 2006
+         |  | |   |  |   |
+         1  2 3   4  5   6
+    -->
+{{ end }}
+
+{{ define "postWithPermission" }}
+    <div class="jumbotron" data-post-id="{{ .ID }}">
+        {{ template "headerPost" . }}
+        <p>
+            {{ template "likes" . }}
+            {{ template "editable" }}
+            {{ template "removable" }}
+        </p>
+    </div>
+{{ end }}
+
+{{ define "postWithoutPermission" }}
+    <div class="jumbotron" data-post-id="{{ .ID }}">
+        {{ template "headerPost" . }}
+        <p>
+            {{ template "likes" . }}
+        </p>
+    </div>
+{{ end }}

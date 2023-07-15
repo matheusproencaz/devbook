@@ -5,6 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"web/src/config"
+	"web/src/cookies"
+	"web/src/models"
 	"web/src/responses"
 )
 
@@ -22,16 +25,30 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response, erro := http.Post("http://localhost:5000/login", "application/json", bytes.NewBuffer(user))
+	url := fmt.Sprintf("%s/login", config.APIURL)
+	response, erro := http.Post(url, "application/json", bytes.NewBuffer(user))
 	if erro != nil {
 		responses.JSON(w, http.StatusInternalServerError, responses.ErroAPI{Erro: erro.Error()})
 		return
 	}
+	defer response.Body.Close()
 
-	// O professor fez o jwt token retornar pelo body, eu no caso utilizei os headers, token.
-	// Como seria caso eu tivesse feito pelo body:
-	// token, _ = ioutil.ReadAll(response.Body) //ioutil retorna slice de byte([]byte)
-	// string(token) //converter para string
-	token := response.Header.Get("Token")
-	fmt.Println(token)
+	if response.StatusCode >= 400 {
+		responses.HandleError(w, response)
+		return
+	}
+
+	var dataAuth models.DataAuth
+	if erro = json.NewDecoder(response.Body).Decode(&dataAuth); erro != nil {
+		responses.JSON(w, http.StatusUnprocessableEntity, responses.ErroAPI{Erro: erro.Error()})
+		return
+	}
+
+	// Cookies
+	if erro = cookies.Save(w, dataAuth.ID, dataAuth.Token); erro != nil {
+		responses.JSON(w, http.StatusUnprocessableEntity, responses.ErroAPI{Erro: erro.Error()})
+		return
+	}
+
+	responses.JSON(w, http.StatusOK, nil)
 }

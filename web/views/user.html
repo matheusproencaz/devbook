@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Devbook - {{ .User.Name }} </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/assets/css/bootstrap.css">
+</head>
+<body>
+    {{ template "navbar" }}
+
+    {{ $FollowedByLoggedInUser := false }}
+    {{ range .User.Followers }}
+        {{ if (eq .ID $.LoggedInUserID )}}
+            {{ $FollowedByLoggedInUser = true}}
+        {{ end }}
+    {{ end }}
+
+    <div class="container-fluid">
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Perfil do Usuário</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">
+                            {{ .User.Name }} - {{ .User.Nick }} - Membro desde:
+                            {{ .User.CreateAt.Format "02/01/2006" }}
+                        </h6>
+
+                        <p class="card-text">
+                            <a href="#" data-toggle="modal" data-target="#modal-followers">
+                                Seguidores: {{ len .User.Followers }}
+                            </a>
+                        </p>
+
+                        <p class="card-text" data-toggle="modal" data-target="#modal-following">
+                            <a href="#">
+                                Seguindo: {{ len .User.Following }}
+                            </a>
+                        </p>
+                        
+                        <a href="#" class="card-link">
+                            {{ if $FollowedByLoggedInUser}}
+                                <button id="stop-follow" class="btn btn-info" data-user-id="{{ .User.ID }}">
+                                    Parar de Seguir
+                                </button>
+
+                            {{ else }}
+
+                                <button id="follow" class="btn btn-info" data-user-id="{{ .User.ID }}">
+                                    Seguir
+                                </button>
+
+                            {{ end}}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Publicações do Usuário {{ .User.Nick}} </h5>
+                        <p class="card-text">
+                            {{ range .User.Posts }}
+                                {{ template "postWithoutPermission" . }}
+                            {{ else }}
+                                <p class="text-muted text-center">
+                                    Nenhuma publicação por enquanto...
+                                </p>
+                            {{ end }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{ template "modal-followers" .User }}
+    {{ template "modal-following" .User }}
+    {{ template "footer"}}
+    {{ template "scripts"}}
+    <script src="/assets/js/posts.js"></script>
+    <script src="/assets/js/user.js"></script>
+</body>
+</html>

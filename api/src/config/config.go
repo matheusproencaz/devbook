@@ -31,7 +31,17 @@ func Load() {
 		Port = 9000
 	}
 
-	StringDatabaseConection = fmt.Sprintf("%s:%s@/%s?charset=utf8&parseTime=True&loc=Local",
+	// StringDatabaseConection = fmt.Sprintf("%s:%s@/%s?charset=utf8&parseTime=True&loc=Local",
+	// 	os.Getenv("DB_USER"),
+	// 	os.Getenv("DB_PASSWORD"),
+	// 	os.Getenv("DB_NAME"),
+	// )
+
+	/*
+	   set databse url in this format from root directory
+	   DATABASE_URL=postgres://user:password@host:port/database
+	*/
+	StringDatabaseConection = fmt.Sprintf("%s:%s@tcp(mysqlDB:3306)/%s?charset=utf8&parseTime=True&loc=Local",
 		os.Getenv("DB_USER"),
 		os.Getenv("DB_PASSWORD"),
 		os.Getenv("DB_NAME"),

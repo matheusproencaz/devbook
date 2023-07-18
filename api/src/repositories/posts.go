@@ -40,21 +40,11 @@ func (repository posts) CreatePost(posts models.Posts) (uint64, error) {
  */
 func (repository posts) GetPosts(userID uint64) ([]models.Posts, error) {
 	// Usando LEFT JOIN
-	// lines, erro := repository.db.Query(
-	// 	`SELECT DISTINCT p.*, u.nick FROM posts p
-	// 	INNER JOIN users u ON u.id = p.author_id
-	// 	LEFT JOIN followers f ON p.author_id = f.user_id
-	// 	WHERE u.id = ? OR f.follower_id = ?`,
-	// 	userID, userID,
-	// )
-
-	// Não usando LEFT JOIN
 	lines, erro := repository.db.Query(
-		`SELECT DISTINCT p.*, u.nick
-		FROM posts p INNER JOIN users u ON u.id = p.author_id
-		INNER JOIN followers f ON f.follower_id = ?
-		WHERE p.author_id = ? OR p.author_id = f.user_id
-		ORDER BY 1 DESC`,
+		`SELECT DISTINCT p.*, u.nick FROM posts p
+		INNER JOIN users u ON u.id = p.author_id
+		LEFT JOIN followers f ON p.author_id = f.user_id
+		WHERE u.id = ? OR f.follower_id = ?`,
 		userID, userID,
 	)
 

@@ -8,6 +8,6 @@ import (
 var homeRoute = Route{
 	URI:       "/home",
 	Method:    http.MethodGet,
-	Handler:   controllers.LoadHomeScreen,
+	Handler:   controllers.LoadHomePage,
 	NeedsAuth: true,
 }

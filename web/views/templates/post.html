@@ -18,7 +18,7 @@
 {{ define "headerPost"}}
     <h1 class="display-4"> {{ .Title }}</h1>
     <p class="lead"> {{ .Content }} </p>
-    <a href="#"> {{ .AuthorNick }} - {{ .CreateAt.Format "02/01/2006" }} </a>
+    <a href="/users/{{ .AuthorID }}"> {{ .AuthorNick }} - {{ .CreateAt.Format "02/01/2006" }} </a>
     <hr class="my-4">
     <!-- 
         O Golang tem uma forma diferente de formatação de datas, ele utiliza uma data como referencia.

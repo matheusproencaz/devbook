@@ -2,8 +2,8 @@ package models
 
 import "time"
 
-// Posts representa uma publicação feita por um usuário
-type Posts struct {
+// Post representa uma publicação feita por um usuário
+type Post struct {
 	ID         uint64    `json:"id"`
 	Title      string    `json:"title,omitempty"`
 	Content    string    `json:"content,omitempty"`

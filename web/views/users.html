@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Devbook - Usuários</title>
+    <link rel="stylesheet" href="/assets/css/bootstrap.css">
+</head>
+<body>
+    {{ template "navbar" }}
+
+    <div class="container-fluid">
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Usuários Encontrados</h5>
+                        {{ range . }}
+                            <p class="card-text">
+                                {{ .Name }} - <a href="/users/{{ .ID }}">{{ .Nick }}</a> - Membro desde: {{ .CreateAt.Format "02/01/2006" }}
+                            </p>
+                        {{ else }}
+                            <p class="card-text">
+                                Nenhum usuário encontrado!
+                            </p>
+                        {{ end }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{ template "footer" }}
+    {{ template "scripts" }}
+    <script src="/assets/js/user.js"></script>
+</body>
+</html>

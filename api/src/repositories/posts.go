@@ -193,8 +193,8 @@ func (repository posts) LikePost(postID uint64) error {
 	return nil
 }
 
-// UnLikePost diminui o número de curtidas na publicação
-func (repository posts) UnLikePost(postID uint64) error {
+// DislikePost diminui o número de curtidas na publicação
+func (repository posts) DislikePost(postID uint64) error {
 	statement, erro := repository.db.Prepare(`UPDATE posts SET likes = 
 	CASE 
 		WHEN likes > 0 THEN likes - 1

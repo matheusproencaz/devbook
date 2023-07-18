@@ -1,19 +1,17 @@
 
 {{ define "likes" }}
-    <i class="fas fa-heart"></i>
+    <i class="fas fa-heart like-post" style="cursor: pointer;"></i>
     <span> {{ .Likes }} </span>
 {{ end }}
 
 {{ define "editable" }}
-    <a href="/edit" style="text-decoration: none;">
+    <a href="/posts/{{ .ID }}/edit" style="text-decoration: none;">
         <i class="fas fa-edit"></i>
     </a>
 {{ end }}
 
 {{ define "removable" }}
-    <a href="/delete" style="text-decoration: none;">
-        <i class="fas fa-trash text-danger"></i>
-    </a>
+    <i class="fas fa-trash text-danger delete-post" style="cursor: pointer;"></i>
 {{ end }}
 
 
@@ -35,8 +33,8 @@
         {{ template "headerPost" . }}
         <p>
             {{ template "likes" . }}
-            {{ template "editable" }}
-            {{ template "removable" }}
+            {{ template "editable" . }}
+            {{ template "removable" . }}
         </p>
     </div>
 {{ end }}

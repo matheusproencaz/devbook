@@ -267,8 +267,8 @@ func LikePost(w http.ResponseWriter, r *http.Request) {
 	responses.JSON(w, http.StatusNoContent, nil)
 }
 
-// UnLikePost aumenta o número de likes de uma publicação
-func UnLikePost(w http.ResponseWriter, r *http.Request) {
+// DislikePost aumenta o número de likes de uma publicação
+func DislikePost(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	postID, erro := strconv.ParseUint(vars["postId"], 10, 64)
 	if erro != nil {
@@ -284,7 +284,7 @@ func UnLikePost(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 
 	repository := repositories.NewPostsRepository(db)
-	if erro = repository.UnLikePost(postID); erro != nil {
+	if erro = repository.DislikePost(postID); erro != nil {
 		responses.Erro(w, http.StatusInternalServerError, erro)
 		return
 	}

@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 )
 
 // Login é responsável por autenticar um usuário
@@ -52,5 +53,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Add("token", token)
+	userID := strconv.FormatUint(userFromDatabase.ID, 10)
+	responses.JSON(w, http.StatusOK, models.DataAuth{ID: userID, Token: token})
+	// w.Header().Add("token", token)
 }

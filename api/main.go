@@ -9,9 +9,9 @@ import (
 )
 
 func main() {
-	r := router.Gerar()
+	r := router.Generate()
 
-	config.Carregar()
+	config.Load()
 
 	port := fmt.Sprintf(":%d", config.Port)
 	fmt.Printf("Listening in port %s ✨\n", port)

@@ -18,8 +18,8 @@ var (
 	SecretKey []byte
 )
 
-// Carregar vai inicializar as variáveis de ambiente
-func Carregar() {
+// Load vai inicializar as variáveis de ambiente
+func Load() {
 	var erro error
 
 	if erro = godotenv.Load(); erro != nil {

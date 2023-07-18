@@ -1,0 +1,39 @@
+version: "3"
+services:
+  database:
+    image: mysql/mysql-server
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: golang
+      MYSQL_PASSWORD: golang
+      MYSQL_DATABASE: devbook
+    volumes:
+      - ./database/db-dump:/docker-entrypoint-initdb.d
+      - ./sql-scripts:/sql-scripts
+    command: --init-file /sql-scripts/init.sql
+    networks:
+      - net
+  api:
+    build: .
+    image: api
+    container_name: api
+    ports:
+      - 5000:5000
+    depends_on:
+      - database
+    networks:
+      - net
+  web:
+    build: .
+    image: web
+    container_name: web
+    ports:
+      - 5001:5001
+    networks:
+      - net
+
+networks:
+  net:
+    driver: bridge

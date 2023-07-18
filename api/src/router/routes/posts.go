@@ -49,9 +49,9 @@ var routesPosts = []Route{
 		Authentication: true,
 	},
 	{
-		URI:            "/posts/{postId}/unlike",
+		URI:            "/posts/{postId}/dislike",
 		Method:         http.MethodPost,
-		Function:       controllers.UnLikePost,
+		Function:       controllers.DislikePost,
 		Authentication: true,
 	},
 }

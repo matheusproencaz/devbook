@@ -12,7 +12,6 @@ services:
       MYSQL_PASSWORD: golang
       MYSQL_DATABASE: devbook
     volumes:
-      - ./database/db-dump:/docker-entrypoint-initdb.d
       - ./sql-scripts:/sql-scripts
     command: --init-file /sql-scripts/init.sql
     networks:

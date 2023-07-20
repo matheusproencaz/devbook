@@ -1,0 +1,19 @@
+FROM golang:1.14-alpine as builder
+
+WORKDIR /app
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY . .
+
+COPY .env .
+
+EXPOSE 5000
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o api main.go
+
+FROM scratch
+COPY --from=builder /app/api /api
+COPY --from=builder /app/.env /.env
+
+CMD ["./api"]

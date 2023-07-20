@@ -19,7 +19,7 @@ services:
   api:
     build:
       context: ./api
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile_new
     image: api
     container_name: api
     ports:
@@ -31,7 +31,7 @@ services:
   web:
     build:
       context: ./web
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile_new
     image: web
     container_name: web
     ports:

@@ -16,5 +16,6 @@ FROM scratch
 COPY --from=builder /app/web /web
 COPY --from=builder /app/.env /.env
 COPY --from=builder /app/views /views
+COPY --from=builder /app/assets /assets
 
 CMD ["./web"]
